@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Emoji Countdown</title>
+    <style type="text/css">
+    @font-face {
+        font-family: 'digital';
+        src: url('fonts/digital.ttf');
+    }
+    
+    @keyframes wiggle {
+        from {
+            margin-top:30px;
+        }
+        to {
+            margin-top: 0px;
+        }
+    }
+    
+    .green {
+        color: green;
+    }
+    
+    .orange {
+        color: orange;
+    }
+    
+    .red {
+        color: red;
+    }
+    
+    #container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 24em;
+    }
+    
+    #timer {
+        font-family: 'digital';
+        text-align: center;
+        padding: 20px;
+        font-size: 200px;
+        margin-bottom: 40px;
+    }
+    
+    #svg {
+        height: 400px;
+        animation: wiggle 1s ease-in-out 0s infinite alternate
+    }
+    </style>
+</head>
+
+<body>
+    <div id="container">
+        <div class="emoji">
+            <div id="timer" class="green">00</div>
+            <img id="svg" src="svg/1f603.svg" />
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
+    <script type="text/javascript">
+    var counter = window.setInterval(function() {
+        var number = parseInt($('#timer').html()) + 1;
+        addClass(number);
+        $('#timer').html(pad(number, 2));
+    }, 1000);
+    var addClass = function(number) {
+        var cls = "green";
+        if (number > 5) {
+            cls = "red";
+        } else if (number > 3) {
+            cls = "orange";
+        }
+        $('#timer').attr('class', cls);
+        changeEmoji(cls);
+    };
+    var changeEmoji = function(color) {
+        var emojis = {
+            green: '1f603',
+            orange: '1f62e',
+            red: '1f922'
+        };
+        var expectedEmojiURL = 'svg/' + emojis[color] + '.svg';
+        var currentEmojiURL = $('#svg').attr('src');
+        if (expectedEmojiURL != currentEmojiURL) {
+            $('#svg').attr('src', expectedEmojiURL);
+        }
+    }
+
+    function pad(n, width, z) {
+        z = z || '0';
+        n = n + '';
+        return n.length >= width ? n : new Array(width - n.length + 1).join(z) + n;
+    }
+    </script>
+</body>
+
+</html>
