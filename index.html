@@ -12,10 +12,30 @@
     
     @keyframes wiggle {
         from {
-            margin-top:30px;
+            margin-top: 30px;
         }
         to {
             margin-top: 0px;
+        }
+    }
+    
+    @keyframes rotate {
+        from {
+            width: 90%;
+            margin-top: 30px;
+            transform: rotateY(30deg);
+        }
+        to {
+            margin-top: 0px;
+        }
+    }
+    
+    @keyframes blink {
+        from {
+            opacity: 0.2;
+        }
+        to {
+            opacity: 1;
         }
     }
     
@@ -28,6 +48,14 @@
     }
     
     .red {
+        color: red;
+    }
+    
+    .red-danger {
+        color: red;
+    }
+    
+    .red-dead {
         color: red;
     }
     
@@ -48,7 +76,7 @@
     
     #svg {
         height: 400px;
-        animation: wiggle 1s ease-in-out 0s infinite alternate
+        animation: wiggle 1s ease-in-out 0s infinite alternate;
     }
     </style>
 </head>
@@ -62,16 +90,47 @@
     </div>
     <script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
     <script type="text/javascript">
+    var clickCounter = 0;
+    var allowedTime=30;
+    var warningTimeStart=45;
+    var deadTime=60;
+    $('body').keypress(function() {
+        clickCounter++;
+        if(clickCounter>2){
+        	clickCounter=0;
+        }
+    });
     var counter = window.setInterval(function() {
-        var number = parseInt($('#timer').html()) + 1;
+        
+        if (clickCounter == 1) {
+            $('#svg').attr("style", "animation:none;");
+            return;
+        }
+        if (clickCounter == 2) {
+            var number = 0;
+            $('#timer').attr("style", "");
+        } else {
+            var number = parseInt($('#timer').html()) + 1;
+            $('#svg').attr("style", "");
+        }
         addClass(number);
         $('#timer').html(pad(number, 2));
     }, 1000);
     var addClass = function(number) {
         var cls = "green";
-        if (number > 5) {
+        if (number > deadTime) {
+            cls = "red-dead";
+            $('#svg').attr("style", "animation-name:blink;animation-duration:0.5s");
+            $('#timer').attr("style", "animation:blink 0.5s ease-in-out 0s infinite alternate");
+        } else if (number == deadTime) {
+            var audio = new Audio('sound/end.mp3');
+            audio.play();
+            cls = "red-danger";
+            $('#svg').attr("style", "animation-name:rotate;animation-duration:1s");
+        } else if (number > warningTimeStart) {
             cls = "red";
-        } else if (number > 3) {
+            $('#svg').attr("style", "animation-duration:0.1s");
+        } else if (number > allowedTime) {
             cls = "orange";
         }
         $('#timer').attr('class', cls);
@@ -81,7 +140,9 @@
         var emojis = {
             green: '1f603',
             orange: '1f62e',
-            red: '1f922'
+            red: '1f922',
+            'red-danger': '1f4a5',
+            'red-dead': '1f635'
         };
         var expectedEmojiURL = 'svg/' + emojis[color] + '.svg';
         var currentEmojiURL = $('#svg').attr('src');
