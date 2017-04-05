@@ -1,0 +1,23 @@
+{
+  "name": "dc-standup-runner",
+  "version": "0.0.1",
+  "description": "standup timer for DietCode",
+  "main": "index.js",
+  "keywords": [],
+  "engines": {
+    "node": "6.9.4"
+  },
+  "dependencies": {
+    
+    "node-static": "^0.7.9"
+  },
+  "scripts": {
+    "start": "node index.js"
+    
+  },
+  "author": "ahmar siddiqui<ahmar.siddiqui@gmail.com>",
+  "license": "MIT",
+  "devDependencies": {
+    
+  }
+}
