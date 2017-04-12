@@ -78,10 +78,34 @@
         height: 400px;
         animation: wiggle 1s ease-in-out 0s infinite alternate;
     }
+    
+    .overlay {
+        height: 100vh;
+        width: 100%;
+        position: absolute;
+        z-index: 10;
+        /*background-color: black;*/
+        background-image: url('image.jpg');
+        -webkit-filter: blur(15px);
+        -moz-filter: blur(15px);
+        -o-filter: blur(15px);
+        -ms-filter: blur(15px);
+        filter: blur(15px);
+        
+}
+    }
+    
+    html,
+    body,
+    .overlay {
+        padding: 0;
+        margin: 0;
+    }
     </style>
 </head>
 
 <body>
+    <div class="overlay">&nbsp;</div>
     <div id="container">
         <div class="emoji">
             <div id="timer">00</div>
@@ -89,22 +113,38 @@
         </div>
     </div>
     <script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
+    <script src="db.js"></script>
     <script type="text/javascript">
     var clickCounter = 0;
     var dullTime = 15;
     var allowedTime = 30;
     var warningTimeStart = 45;
     var deadTime = 60;
+    var addedEntry = false;
     $('body').keypress(function() {
         clickCounter++;
         if (clickCounter > 2) {
             clickCounter = 0;
         }
     });
+    $('body').dblclick(function() {
+        showStats();
+    })
+    showStats = function() {
+        getTimingForAday('now').then(function(result) {
+            if (!result || !result.length)
+                return;
+
+        });
+    }
     var counter = window.setInterval(function() {
 
         if (clickCounter == 1) {
             // $('#svg').attr("style", "animation:none;");
+            if (!addedEntry) {
+                addTiming(parseInt($('#timer').html()))
+                addedEntry = !addedEntry;
+            }
             return;
         }
         if (clickCounter == 2) {
@@ -112,6 +152,7 @@
             $('#timer').attr("style", "");
             $('#svg').attr("style", "");
             clickCounter = 0;
+            addedEntry = !addedEntry;
         } else {
             var number = parseInt($('#timer').html()) + 1;
             $('#svg').attr("style", "");
