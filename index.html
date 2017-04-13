@@ -10,6 +10,27 @@
         src: url('fonts/digital.ttf');
     }
     
+    @font-face {
+        font-family: 'poppins';
+        src: url('fonts/Poppins-Light.ttf');
+        font-weight: lighter;
+        font-style: normal;
+    }
+    
+    @font-face {
+        font-family: 'poppins';
+        src: url('fonts/Poppins-Bold.ttf');
+        font-weight: bold;
+        font-style: normal;
+    }
+    
+    @font-face {
+        font-family: 'poppins';
+        src: url('fonts/Poppins-Regular.ttf');
+        font-weight: normal;
+        font-style: normal;
+    }
+    
     @keyframes wiggle {
         from {
             margin-top: 30px;
@@ -83,16 +104,13 @@
         height: 100vh;
         width: 100%;
         position: absolute;
-        z-index: 10;
-        /*background-color: black;*/
+        z-index: -10;
         background-image: url('image.jpg');
         -webkit-filter: blur(15px);
         -moz-filter: blur(15px);
         -o-filter: blur(15px);
         -ms-filter: blur(15px);
         filter: blur(15px);
-        
-}
     }
     
     html,
@@ -105,7 +123,83 @@
 </head>
 
 <body>
-    <div class="overlay">&nbsp;</div>
+    <style type="text/css">
+    .stats {
+        height: 100vh;
+        width: 100%;
+    }
+    
+    .today,
+    .yesterday {
+        float: left;
+        width: 100%;
+        text-align: center;
+        filter: none !important;
+        font-family: 'poppins';
+    }
+    
+    .clearfix {
+        float: none;
+        clear: both;
+    }
+    
+    .today {
+        font-size: 80px;
+    }
+    
+    .yesterday {
+        padding: 0;
+        margin: 0;
+    }
+    
+    .col {
+        width: 25%;
+        float: left;
+        text-align: center;
+    }
+    
+    .number {
+        font-weight: bold;
+    }
+    
+    .title {
+        font-weight: 100;
+    }
+    
+    .overlay,
+    .stats {
+        display: none;
+    }
+    </style>
+    <div class="overlay">
+    </div>
+    <div class="stats">
+        <div class="today">
+            <div class="col">
+                <div class="number today-total">0</div>
+                <div class="title">TOTAL</div>
+            </div>
+            <div class="col">
+                <div class="number today-avg">0</div>
+                <div class="title">AVG</div>
+            </div>
+            <div class="col">
+                <div class="number today-max">0</div>
+                <div class="title">HIGHEST</div>
+            </div>
+            <div class="col">
+                <div class="number today-min">0</div>
+                <div class="title">LOWEST</div>
+            </div>
+        </div>
+        <div class="yesterday">
+            <div class="avg-time">
+                <span class="title">AVG sME:</span>
+                <span class="today-total">30.26</span>
+            </div>
+        </div>
+    </div>
+    <div class="clearfix"></div>
     <div id="container">
         <div class="emoji">
             <div id="timer">00</div>
@@ -121,6 +215,7 @@
     var warningTimeStart = 45;
     var deadTime = 60;
     var addedEntry = false;
+    var pauseTimer = false;
     $('body').keypress(function() {
         clickCounter++;
         if (clickCounter > 2) {
@@ -128,17 +223,56 @@
         }
     });
     $('body').dblclick(function() {
-        showStats();
+        if (!$('.overlay').is(':visible')) {
+            $('.overlay,.stats').fadeIn();
+            showStats();
+            pauseTimer = true;
+        } else {
+            $('.overlay,.stats').fadeOut();
+            pauseTimer=false;
+            clickCounter=2;
+
+        }
+
     })
     showStats = function() {
         getTimingForAday('now').then(function(result) {
             if (!result || !result.length)
                 return;
+            result = Array.from(result);
+            var timings = result.map(e => e.timing)
+            var min = Math.min(...timings)
+            var max = Math.max(...timings)
+            var total = timings.reduce((e, b) => e + b, 0)
+            var avg = (total / timings.length);
+            if (avg % 1 !== 0) {
+                avg = avg.toFixed(2);
+            }
+            updateStat({
+                min,
+                max,
+                total,
+                avg
+            })
 
         });
     }
-    var counter = window.setInterval(function() {
 
+    function updateStat(stats) {
+        $('.today-total').html(stats.total)
+        $('.today-min').html(stats.min)
+        $('.today-max').html(stats.max)
+        $('.today-avg').html(stats.avg)
+        animateNumber();
+    }
+
+    function min(a, b, c) {
+        debugger;
+    }
+    var counter = window.setInterval(function() {
+        if (pauseTimer) {
+            return
+        }
         if (clickCounter == 1) {
             // $('#svg').attr("style", "animation:none;");
             if (!addedEntry) {
@@ -197,6 +331,20 @@
         if (expectedEmojiURL != currentEmojiURL) {
             $('#svg').attr('src', expectedEmojiURL);
         }
+    }
+
+    function animateNumber() {
+        $('.number').each(function() {
+            $(this).prop('Counter', 0).animate({
+                Counter: $(this).text().replace(/,/g, '')
+            }, {
+                duration: 1000,
+                easing: 'swing',
+                step: function(now) {
+                    $(this).text(Math.ceil(now));
+                }
+            });
+        });
     }
 
     function pad(n, width, z) {
