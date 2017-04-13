@@ -105,7 +105,7 @@
         width: 100%;
         position: absolute;
         z-index: -10;
-        background-image: url('image.jpg');
+        /*background-image: url('image.jpg');*/
         -webkit-filter: blur(15px);
         -moz-filter: blur(15px);
         -o-filter: blur(15px);
@@ -120,6 +120,7 @@
         margin: 0;
     }
     </style>
+    <link rel="stylesheet" href="morris.css">
 </head>
 
 <body>
@@ -130,7 +131,7 @@
     }
     
     .today,
-    .yesterday {
+    #chart {
         float: left;
         width: 100%;
         text-align: center;
@@ -145,11 +146,13 @@
     
     .today {
         font-size: 80px;
+        height:40%;
     }
     
-    .yesterday {
+    #chart {
         padding: 0;
         margin: 0;
+        height: 60%;
     }
     
     .col {
@@ -164,6 +167,7 @@
     
     .title {
         font-weight: 100;
+        margin-top:-16%;
     }
     
     .overlay,
@@ -192,7 +196,7 @@
                 <div class="title">LOWEST</div>
             </div>
         </div>
-        <div class="yesterday">
+        <div id="chart">
             <div class="avg-time">
                 <span class="title">AVG sME:</span>
                 <span class="today-total">30.26</span>
@@ -208,6 +212,8 @@
     </div>
     <script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
     <script src="db.js"></script>
+    <script src="raphael-min.js"></script>
+    <script src="morris.min.js"></script>
     <script type="text/javascript">
     var clickCounter = 0;
     var dullTime = 15;
@@ -229,8 +235,8 @@
             pauseTimer = true;
         } else {
             $('.overlay,.stats').fadeOut();
-            pauseTimer=false;
-            clickCounter=2;
+            pauseTimer = false;
+            clickCounter = 2;
 
         }
 
@@ -255,6 +261,7 @@
                 avg
             })
 
+
         });
     }
 
@@ -264,6 +271,47 @@
         $('.today-max').html(stats.max)
         $('.today-avg').html(stats.avg)
         animateNumber();
+        drawChart();
+    }
+
+    function drawChart() {
+        $('#chart').html('')
+        Morris.Area({
+            element: 'chart',
+            data: [{
+                y: '2006',
+                a: 100,
+                b: 90
+            }, {
+                y: '2007',
+                a: 75,
+                b: 65
+            }, {
+                y: '2008',
+                a: 50,
+                b: 40
+            }, {
+                y: '2009',
+                a: 75,
+                b: 65
+            }, {
+                y: '2010',
+                a: 50,
+                b: 40
+            }, {
+                y: '2011',
+                a: 75,
+                b: 65
+            }, {
+                y: '2012',
+                a: 100,
+                b: 90
+            }],
+            xkey: 'y',
+            ykeys: ['a', 'b'],
+            labels: ['Series A', 'Series B'],
+            lineColors: ["rgba(155,215,215,0.2)", "rgba(121,215,255,0.1)"]
+        })
     }
 
     function min(a, b, c) {
